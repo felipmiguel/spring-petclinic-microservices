@@ -74,6 +74,12 @@
         </dependency>
         -->
 
+        <!-- Azure JDBC Starter -->
+        <dependency>
+            <groupId>com.azure.spring</groupId>
+            <artifactId>spring-cloud-azure-starter-jdbc-mysql</artifactId>
+        </dependency>
+
         <!-- Third parties-->
 		<dependency>
 			<groupId>org.projectlombok</groupId>

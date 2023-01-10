@@ -39,16 +39,11 @@ You will:
 
 ## What you will need
 
-In order to deploy a Java app to cloud, you need 
-an Azure subscription. If you do not already have an Azure 
-subscription, you can activate your 
-[MSDN subscriber benefits](https://azure.microsoft.com/pricing/member-offers/msdn-benefits-details/) 
-or sign up for a 
-[free Azure account]((https://azure.microsoft.com/free/)).
+In order to deploy a Java app to cloud, you need an Azure subscription. If you do not already have an Azure subscription, you can activate your [MSDN subscriber benefits](https://azure.microsoft.com/pricing/member-offers/msdn-benefits-details/) or sign up for a [free Azure account]((https://azure.microsoft.com/free/)).
 
 In addition, you will need the following:
 
-| [Azure CLI version 2.17.1 or higher](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) 
+| [Azure CLI version 2.44.0 or higher](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) 
 | [Java 8](https://www.azul.com/downloads/azure-only/zulu/?version=java-8-lts&architecture=x86-64-bit&package=jdk) 
 | [Maven](https://maven.apache.org/download.cgi) 
 | [MySQL CLI](https://dev.mysql.com/downloads/shell/)
@@ -92,12 +87,10 @@ Install the Azure Spring Cloud extension for the Azure CLI using the following c
 ```bash
     az extension add --name spring-cloud
 ```
-Note - `spring-cloud` CLI extension `2.1.0` or later is a pre-requisite to enable the
-latest Java in-process agent for Application Insights. If you already 
-have the CLI extension, you may need to upgrade to the latest using --
+Note - `spring` CLI extension `1.5.0` or later is a pre-requisite to enable the latest Java in-process agent for Application Insights. If you already have the CLI extension, you may need to upgrade to the latest using --
 
 ```bash
-    az extension update --name spring-cloud
+    az extension update --name spring
 ```
 
 ## Clone and build the repo
@@ -171,7 +164,7 @@ Create a resource group to contain your Azure Spring Cloud service.
 Create an instance of Azure Spring Cloud.
 
 ```bash
-    az spring-cloud create --name ${SPRING_CLOUD_SERVICE} \
+    az spring create --name ${SPRING_CLOUD_SERVICE} \
             --sku standard \
             --sampling-rate 100 \
             --resource-group ${RESOURCE_GROUP} \
@@ -186,7 +179,7 @@ Set your default resource group name and cluster name using the following comman
     az configure --defaults \
         group=${RESOURCE_GROUP} \
         location=${REGION} \
-        spring-cloud=${SPRING_CLOUD_SERVICE}
+        spring=${SPRING_CLOUD_SERVICE}
 ```
 
 ### Create and configure Log Analytics Workspace
@@ -252,38 +245,38 @@ Setup diagnostics and publish logs and metrics from Spring Boot apps to Azure Lo
            ]'
 ```
 
-### Load Spring Cloud Config Server
+### Load Spring Apps Config Server
 
 Use the `application.yml` in the root of this project to load configuration into the Config Server in Azure Spring Cloud.
 
 ```bash
-    az spring-cloud config-server set \
+    az spring config-server set \
         --config-file application.yml \
         --name ${SPRING_CLOUD_SERVICE}
 ```
 
-### Create applications in Azure Spring Cloud
+### Create applications in Azure Spring Apps
 
 Create 5 apps.
 
 ```bash
-    az spring-cloud app create --name ${API_GATEWAY} --instance-count 1 --assign-endpoint true \
+    az spring app create --name ${API_GATEWAY} --instance-count 1 --assign-endpoint true \
         --memory 2 \
         --jvm-options='-Xms2048m -Xmx2048m'
     
-    az spring-cloud app create --name ${ADMIN_SERVER} --instance-count 1 --assign-endpoint true \
+    az spring app create --name ${ADMIN_SERVER} --instance-count 1 --assign-endpoint true \
         --memory 2 \
         --jvm-options='-Xms2048m -Xmx2048m'
     
-    az spring-cloud app create --name ${CUSTOMERS_SERVICE} --instance-count 1 \
+    az spring app create --name ${CUSTOMERS_SERVICE} --instance-count 1 \
         --memory 2 \
         --jvm-options='-Xms2048m -Xmx2048m'
     
-    az spring-cloud app create --name ${VETS_SERVICE} --instance-count 1 \
+    az spring app create --name ${VETS_SERVICE} --instance-count 1 \
         --memory 2 \
         --jvm-options='-Xms2048m -Xmx2048m'
     
-    az spring-cloud app create --name ${VISITS_SERVICE} --instance-count 1 \
+    az spring app create --name ${VISITS_SERVICE} --instance-count 1 \
         --memory 2 \
         --jvm-options='-Xms2048m -Xmx2048m'
 ```
