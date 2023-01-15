@@ -1,10 +1,11 @@
 name: Deploy to Azure Spring Cloud with Key Vault
 on: [push]
 
+permissions:
+  id-token: write
+  contents: read
+
 env:
-  AZURE_SUBSCRIPTION: 799c12ba-353c-44a1-883d-84808ebb2216 # customize this
-  SPRING_CLOUD_SERVICE: yuchensp # customize this
-  KEYVAULT: yuchenkv # customize this
   # ==== APPS ====:
   API_GATEWAY: api-gateway
   ADMIN_SERVER: admin-server
@@ -12,48 +13,50 @@ env:
   VETS_SERVICE: vets-service
   VISITS_SERVICE: visits-service
   # ==== JARS ====:
-  API_GATEWAY_JAR: spring-petclinic-api-gateway/target/spring-petclinic-api-gateway-2.5.1.jar
-  ADMIN_SERVER_JAR: spring-petclinic-admin-server/target/spring-petclinic-admin-server-2.5.1.jar
-  CUSTOMERS_SERVICE_JAR: spring-petclinic-customers-service/target/spring-petclinic-customers-service-2.5.1.jar
-  VETS_SERVICE_JAR: spring-petclinic-vets-service/target/spring-petclinic-vets-service-2.5.1.jar
-  VISITS_SERVICE_JAR: spring-petclinic-visits-service/target/spring-petclinic-visits-service-2.5.1.jar
+  API_GATEWAY_JAR: spring-petclinic-api-gateway/target/spring-petclinic-api-gateway-3.0.1.jar
+  ADMIN_SERVER_JAR: spring-petclinic-admin-server/target/spring-petclinic-admin-server-3.0.1.jar
+  CUSTOMERS_SERVICE_JAR: spring-petclinic-customers-service/target/spring-petclinic-customers-service-3.0.1.jar
+  VETS_SERVICE_JAR: spring-petclinic-vets-service/target/spring-petclinic-vets-service-3.0.1.jar
+  VISITS_SERVICE_JAR: spring-petclinic-visits-service/target/spring-petclinic-visits-service-3.0.1.jar
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Login with Key Vault SP
+    - name: Azure CLI Login
       uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     
-    - name: Get service SP from Key Vault
-      uses: Azure/get-keyvault-secrets@v1
-      with:
-        keyvault: ${{ env.KEYVAULT }}
-        secrets: "AZURE-CREDENTIALS-FOR-SPRING"
-      id: keyvaultaction
+    # - name: Get service SP from Key Vault
+    #   uses: Azure/get-keyvault-secrets@v1
+    #   with:
+    #     keyvault: ${{ env.KEYVAULT }}
+    #     secrets: "AZURE-CREDENTIALS-FOR-SPRING"
+    #   id: keyvaultaction
     
-    - name: Get MySQL Secrets from Key Vault
-      uses: Azure/get-keyvault-secrets@v1
-      with:
-        keyvault: ${{ env.KEYVAULT }}
-        secrets: "MYSQL-SERVER-FULL-NAME,MYSQL-DATABASE-NAME,MYSQL-SERVER-ADMIN-LOGIN-NAME,MYSQL-SERVER-ADMIN-PASSWORD"
-      id: mysqlsecrets
+    # - name: Get MySQL Secrets from Key Vault
+    #   uses: Azure/get-keyvault-secrets@v1
+    #   with:
+    #     keyvault: ${{ env.KEYVAULT }}
+    #     secrets: "MYSQL-SERVER-FULL-NAME,MYSQL-DATABASE-NAME,MYSQL-SERVER-ADMIN-LOGIN-NAME,MYSQL-SERVER-ADMIN-PASSWORD"
+    #   id: mysqlsecrets
       
-    - name: Login with Service SP
-      uses: azure/login@v1
-      with:
-        creds: ${{ steps.keyvaultaction.outputs.AZURE-CREDENTIALS-FOR-SPRING }}
+    # - name: Login with Service SP
+    #   uses: azure/login@v1
+    #   with:
+    #     creds: ${{ steps.keyvaultaction.outputs.AZURE-CREDENTIALS-FOR-SPRING }}
         
     - name: Checkout your repo
       uses: actions/checkout@v2
       
-    - name: Set up JDK 11
+    - name: Set up JDK 17
       uses: actions/setup-java@v2
       with:
-        java-version: '11'
-        distribution: 'adopt'
+        java-version: 17
+        distribution: 'microsoft'
         cache: maven
 
     - name: maven build, clean
@@ -61,71 +64,64 @@ jobs:
         mvn clean package -DskipTests -Denv=cloud
       
     - name: Deploy api-gateway
-      uses: Azure/spring-cloud-deploy@v1
+      uses: azure/spring-apps-deploy@v1
       with:
-        azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
+        azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
+        service-name: ${{ secrets.SPRING_APPS_SERVICE_NAME }}
         app-name: ${{ env.API_GATEWAY }}
         use-staging-deployment: false
         package: ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }}
-        jvm-options: -Xms2048m -Xmx2048m -Dspring.profiles.active=mysql
+        jvm-options: -Xms2048m -Xmx2048m
+        environment-variables: SPRING_PROFILES_ACTIVE=passwordless
     
     - name: Deploy admin-server
-      uses:  Azure/spring-cloud-deploy@v1
+      uses:  azure/spring-apps-deploy@v1
       with:
-        azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
+        azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
+        service-name: ${{ secrets.SPRING_APPS_SERVICE_NAME }}
         app-name: ${{ env.ADMIN_SERVER }}
         use-staging-deployment: false
         package: ${{ github.workspace }}/${{ env.ADMIN_SERVER_JAR }}
-        jvm-options: -Xms2048m -Xmx2048m -Dspring.profiles.active=mysql    
+        jvm-options: -Xms2048m -Xmx2048m
+        environment-variables: "-SPRING_PROFILES_ACTIVE passwordless"
 
     - name: Deploy customers-service
-      uses: Azure/spring-cloud-deploy@v1
+      uses: azure/spring-apps-deploy@v1
       with:
-        azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
+        azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
+        service-name: ${{ secrets.SPRING_APPS_SERVICE_NAME }}
         app-name: ${{ env.CUSTOMERS_SERVICE }}
         use-staging-deployment: false
         package: ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE_JAR }}
-        jvm-options: -Xms2048m -Xmx2048m -Dspring.profiles.active=mysql
+        jvm-options: -Xms2048m -Xmx2048m
         # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
-        environment-variables: "-MYSQL_SERVER_FULL_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-FULL-NAME }} \
-        -MYSQL_DATABASE_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-DATABASE-NAME }} \
-        -MYSQL_SERVER_ADMIN_LOGIN_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-LOGIN-NAME }} \
-        -MYSQL_SERVER_ADMIN_PASSWORD ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-PASSWORD }}"
+        environment-variables: -SPRING_PROFILES_ACTIVE passwordless
 
     - name: Deploy vets-service
-      uses: Azure/spring-cloud-deploy@v1
+      uses: azure/spring-apps-deploy@v1
       with:
-        azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
+        azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
+        service-name: ${{ secrets.SPRING_APPS_SERVICE_NAME }}
         app-name: ${{ env.VETS_SERVICE }}
         use-staging-deployment: false
         package: ${{ github.workspace }}/${{ env.VETS_SERVICE_JAR }}
-        jvm-options: -Xms2048m -Xmx2048m -Dspring.profiles.active=mysql
+        jvm-options: -Xms2048m -Xmx2048m
         # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
-        environment-variables: "-MYSQL_SERVER_FULL_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-FULL-NAME }} \
-        -MYSQL_DATABASE_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-DATABASE-NAME }} \
-        -MYSQL_SERVER_ADMIN_LOGIN_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-LOGIN-NAME }} \
-        -MYSQL_SERVER_ADMIN_PASSWORD ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-PASSWORD }}"    
+        environment-variables: -SPRING_PROFILES_ACTIVE passwordless
 
     - name: Deploy visits-service
-      uses: Azure/spring-cloud-deploy@v1
+      uses: azure/spring-apps-deploy@v1
       with:
-        azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
+        azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         action: deploy
-        service-name: ${{ env.SPRING_CLOUD_SERVICE }}
+        service-name: ${{ secrets.SPRING_APPS_SERVICE_NAME }}
         app-name: ${{ env.VISITS_SERVICE }}
         use-staging-deployment: false
         package: ${{ github.workspace }}/${{ env.VISITS_SERVICE_JAR }}
-        jvm-options: -Xms2048m -Xmx2048m -Dspring.profiles.active=mysql
+        jvm-options: -Xms2048m -Xmx2048m
         # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
-        environment-variables: "-MYSQL_SERVER_FULL_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-FULL-NAME }} \
-        -MYSQL_DATABASE_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-DATABASE-NAME }} \
-        -MYSQL_SERVER_ADMIN_LOGIN_NAME ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-LOGIN-NAME }} \
-        -MYSQL_SERVER_ADMIN_PASSWORD ${{ steps.mysqlsecrets.outputs.MYSQL-SERVER-ADMIN-PASSWORD }}"
+        environment-variables: -SPRING_PROFILES_ACTIVE passwordless
