@@ -64,7 +64,7 @@ jobs:
         mvn clean package -DskipTests -Denv=cloud
       
     - name: Deploy api-gateway
-      uses: azure/spring-apps-deploy@v1
+      uses: Azure/spring-cloud-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         action: deploy
@@ -77,7 +77,7 @@ jobs:
         environment-variables: -SPRING_PROFILES_ACTIVE passwordless
     
     - name: Deploy admin-server
-      uses:  azure/spring-apps-deploy@v1
+      uses:  Azure/spring-cloud-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         action: deploy
@@ -90,7 +90,7 @@ jobs:
         environment-variables: "-SPRING_PROFILES_ACTIVE passwordless"
 
     - name: Deploy customers-service
-      uses: azure/spring-apps-deploy@v1
+      uses: Azure/spring-cloud-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         action: deploy
@@ -104,7 +104,7 @@ jobs:
         environment-variables: -SPRING_PROFILES_ACTIVE passwordless
 
     - name: Deploy vets-service
-      uses: azure/spring-apps-deploy@v1
+      uses: Azure/spring-cloud-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         action: deploy
@@ -118,7 +118,7 @@ jobs:
         environment-variables: -SPRING_PROFILES_ACTIVE passwordless
 
     - name: Deploy visits-service
-      uses: azure/spring-apps-deploy@v1
+      uses: Azure/spring-cloud-deploy@v1
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         action: deploy
