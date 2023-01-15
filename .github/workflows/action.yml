@@ -73,6 +73,7 @@ jobs:
         use-staging-deployment: false
         package: ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }}
         jvm-options: -Xms2048m -Xmx2048m
+        runtime-version: 17
         environment-variables: -SPRING_PROFILES_ACTIVE passwordless
     
     - name: Deploy admin-server
@@ -85,6 +86,7 @@ jobs:
         use-staging-deployment: false
         package: ${{ github.workspace }}/${{ env.ADMIN_SERVER_JAR }}
         jvm-options: -Xms2048m -Xmx2048m
+        runtime-version: 17
         environment-variables: "-SPRING_PROFILES_ACTIVE passwordless"
 
     - name: Deploy customers-service
@@ -97,6 +99,7 @@ jobs:
         use-staging-deployment: false
         package: ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE_JAR }}
         jvm-options: -Xms2048m -Xmx2048m
+        runtime-version: 17
         # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
         environment-variables: -SPRING_PROFILES_ACTIVE passwordless
 
@@ -110,6 +113,7 @@ jobs:
         use-staging-deployment: false
         package: ${{ github.workspace }}/${{ env.VETS_SERVICE_JAR }}
         jvm-options: -Xms2048m -Xmx2048m
+        runtime-version: 17
         # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
         environment-variables: -SPRING_PROFILES_ACTIVE passwordless
 
@@ -123,5 +127,6 @@ jobs:
         use-staging-deployment: false
         package: ${{ github.workspace }}/${{ env.VISITS_SERVICE_JAR }}
         jvm-options: -Xms2048m -Xmx2048m
+        runtime-version: 17
         # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
         environment-variables: -SPRING_PROFILES_ACTIVE passwordless
