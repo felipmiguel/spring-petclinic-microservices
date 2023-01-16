@@ -1,4 +1,4 @@
-name: Deploy to Azure Spring Cloud with Key Vault
+name: Deploy to Azure Spring Apps using passwordless connections
 on: [push]
 
 permissions:
