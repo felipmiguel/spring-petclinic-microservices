@@ -68,7 +68,7 @@ jobs:
       with:
         # Specify the script here
         inlineScript: |
-          az config set extension.use_dynamic_install=yes_without_prompt'
+          az config set extension.use_dynamic_install=yes_without_prompt
           az spring app deploy \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
             --service ${{ secrets.SPRING_CLOUD_SERVICE }} \
@@ -95,8 +95,7 @@ jobs:
         environment-variables: -SPRING_PROFILES_ACTIVE passwordless
     
     - name: Deploy admin-server
-      uses:  azure/spring-apps-deploy@v1
-      if: always()
+      uses:  azure/spring-apps-deploy@v1      
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         action: deploy
@@ -109,8 +108,7 @@ jobs:
         environment-variables: "-SPRING_PROFILES_ACTIVE passwordless"
 
     - name: Deploy customers-service
-      uses: azure/spring-apps-deploy@v1
-      if: always()
+      uses: azure/spring-apps-deploy@v1      
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         action: deploy
@@ -124,8 +122,7 @@ jobs:
         environment-variables: -SPRING_PROFILES_ACTIVE passwordless
 
     - name: Deploy vets-service
-      uses: azure/spring-apps-deploy@v1
-      if: always()
+      uses: azure/spring-apps-deploy@v1      
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         action: deploy
@@ -140,7 +137,6 @@ jobs:
 
     - name: Deploy visits-service
       uses: azure/spring-apps-deploy@v1
-      if: always()
       with:
         azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         action: deploy
