@@ -72,7 +72,7 @@ jobs:
         app-name: ${{ env.API_GATEWAY }}
         use-staging-deployment: false
         package: ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }}
-        jvm-options: -Xms2048m -Xmx2048m -javaagent:"/clinic-share/applicationinsights-agent-3.4.7.jar"
+        jvm-options: -javaagent:"/clinic-share/applicationinsights-agent-3.4.7.jar" -Xms2048m -Xmx2048m
         runtime-version: Java_17
         environment-variables: -SPRING_PROFILES_ACTIVE passwordless
     
