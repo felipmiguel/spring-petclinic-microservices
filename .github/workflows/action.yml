@@ -62,6 +62,23 @@ jobs:
     - name: maven build, clean
       run: |
         mvn clean package -DskipTests
+    
+    - name: Azure CLI Action
+      uses: Azure/cli@v1.0.7
+      with:
+        # Specify the script here
+        inlineScript: |
+          az spring app deploy \
+            --resource-group ${{ secrets.RESOURCE_GROUP }} \
+            --service ${{ secrets.SPRING_CLOUD_SERVICE }} \
+            --name ${{ env.API_GATEWAY }} \
+            --artifact-path ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }} \
+            --jvm-options='-Xms2048m -Xmx2048m' \
+            --runtime-version Java_17 \
+            --env SPRING_PROFILES_ACTIVE=passwordless
+        # Azure CLI version to be used to execute the script. If not provided, latest version is used
+        azcliversion: 2.44.1
+    
       
     - name: Deploy api-gateway
       uses: azure/spring-apps-deploy@v1
