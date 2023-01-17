@@ -61,7 +61,7 @@ jobs:
 
     - name: maven build, clean
       run: |
-        mvn clean package -DskipTests -Denv=cloud
+        mvn clean package -DskipTests
       
     - name: Deploy api-gateway
       uses: azure/spring-apps-deploy@v1
