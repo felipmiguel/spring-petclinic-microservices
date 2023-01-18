@@ -30,25 +30,6 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     
-    # - name: Get service SP from Key Vault
-    #   uses: Azure/get-keyvault-secrets@v1
-    #   with:
-    #     keyvault: ${{ env.KEYVAULT }}
-    #     secrets: "AZURE-CREDENTIALS-FOR-SPRING"
-    #   id: keyvaultaction
-    
-    # - name: Get MySQL Secrets from Key Vault
-    #   uses: Azure/get-keyvault-secrets@v1
-    #   with:
-    #     keyvault: ${{ env.KEYVAULT }}
-    #     secrets: "MYSQL-SERVER-FULL-NAME,MYSQL-DATABASE-NAME,MYSQL-SERVER-ADMIN-LOGIN-NAME,MYSQL-SERVER-ADMIN-PASSWORD"
-    #   id: mysqlsecrets
-      
-    # - name: Login with Service SP
-    #   uses: azure/login@v1
-    #   with:
-    #     creds: ${{ steps.keyvaultaction.outputs.AZURE-CREDENTIALS-FOR-SPRING }}
-        
     - name: Checkout your repo
       uses: actions/checkout@v2
       
@@ -63,24 +44,6 @@ jobs:
       run: |
         mvn clean package -DskipTests
     
-    - name: Azure CLI Action
-      uses: Azure/cli@v1.0.7
-      with:
-        # Specify the script here
-        inlineScript: |
-          az config set extension.use_dynamic_install=yes_without_prompt
-          az spring app deploy \
-            --resource-group ${{ secrets.RESOURCE_GROUP }} \
-            --service ${{ secrets.SPRING_APPS_SERVICE_NAME }} \
-            --name ${{ env.API_GATEWAY }} \
-            --artifact-path ${{ github.workspace }}/${{ env.API_GATEWAY_JAR }} \
-            --jvm-options='-Xms2048m -Xmx2048m' \
-            --runtime-version Java_17 \
-            --env SPRING_PROFILES_ACTIVE=passwordless
-        # Azure CLI version to be used to execute the script. If not provided, latest version is used
-        azcliversion: 2.44.1
-    
-      
     - name: Deploy api-gateway
       uses: azure/spring-apps-deploy@v1
       with:
@@ -118,7 +81,6 @@ jobs:
         package: ${{ github.workspace }}/${{ env.CUSTOMERS_SERVICE_JAR }}
         jvm-options: -Xms2048m -Xmx2048m
         runtime-version: Java_17
-        # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
         environment-variables: -SPRING_PROFILES_ACTIVE passwordless
 
     - name: Deploy vets-service
@@ -132,7 +94,6 @@ jobs:
         package: ${{ github.workspace }}/${{ env.VETS_SERVICE_JAR }}
         jvm-options: -Xms2048m -Xmx2048m
         runtime-version: Java_17
-        # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
         environment-variables: -SPRING_PROFILES_ACTIVE passwordless
 
     - name: Deploy visits-service
@@ -146,5 +107,4 @@ jobs:
         package: ${{ github.workspace }}/${{ env.VISITS_SERVICE_JAR }}
         jvm-options: -Xms2048m -Xmx2048m
         runtime-version: Java_17
-        # Environment variables to be entered using the syntax '-key value'. Values containing spaces should be enclosed in double quotes.
         environment-variables: -SPRING_PROFILES_ACTIVE passwordless
