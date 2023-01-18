@@ -3,14 +3,14 @@ provider "azurerm" {
 }
 
 variable "resource_group" {
-    type = string
+  type = string
 }
 variable "region" {
   type    = string
-  default = "West US 2"
+  default = "eastus"
 }
 variable "spring_cloud_service" {
-  type    = string
+  type = string
 }
 variable "api_gateway" {
   type    = string
@@ -37,20 +37,20 @@ variable "mysql_server_admin_name" {
   default = "sqlAdmin"
 }
 variable "mysql_server_admin_password" {
-  type    = string
+  type = string
 }
 variable "mysql_database_name" {
   type    = string
   default = "petclinic"
 }
 locals {
-  mysql_server_name  = "pcsms-db-${var.resource_group}"
+  mysql_server_name = "pcsms-db-${var.resource_group}"
 }
 
 
 resource "azurerm_resource_group" "example" {
   name     = var.resource_group
-  location =  var.region
+  location = var.region
 }
 
 resource "azurerm_spring_cloud_service" "example" {
@@ -59,11 +59,11 @@ resource "azurerm_spring_cloud_service" "example" {
   location            = azurerm_resource_group.example.location
 
   config_server_git_setting {
-    uri          = "https://github.com/selvasingh/spring-petclinic-microservices-config"
+    uri          = "https://github.com/felipmiguel/spring-petclinic-microservices-config"
     label        = "master"
-    search_paths= ["."]
+    search_paths = ["."]
 
-    }
+  }
 
   tags = {
     Env = "staging"
@@ -102,50 +102,52 @@ resource "azurerm_spring_cloud_app" "visits_service" {
 }
 
 
-resource "azurerm_mysql_server" "example" {
+resource "azurerm_mysql_flexible_server" "example" {
   name                = local.mysql_server_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
-  sku_name = "GP_Gen5_2"
+  sku_name = "B_Standard_B1ms"
 
-  storage_mb = 5120
-  backup_retention_days = 7
+  storage {
+    size_gb = 32
+  }
+  backup_retention_days        = 7
   geo_redundant_backup_enabled = true
 
-  administrator_login          = var.mysql_server_admin_name
-  administrator_login_password = var.mysql_server_admin_password
-  version                      = "5.7"
-  ssl_enforcement_enabled =true
+  administrator_login    = var.mysql_server_admin_name
+  administrator_password = var.mysql_server_admin_password
+  version                = "5.7"
+  zone                   = "1"
 }
 
-resource "azurerm_mysql_database" "example" {
+resource "azurerm_mysql_flexible_database" "example" {
   name                = var.mysql_database_name
   resource_group_name = azurerm_resource_group.example.name
-  server_name         = azurerm_mysql_server.example.name
+  server_name         = azurerm_mysql_flexible_server.example.name
   charset             = "utf8"
   collation           = "utf8_unicode_ci"
 }
 
-resource "azurerm_mysql_firewall_rule" "allazureips" {
+resource "azurerm_mysql_flexible_server_firewall_rule" "allazureips" {
   name                = "allAzureIPs"
   resource_group_name = azurerm_resource_group.example.name
-  server_name         = azurerm_mysql_server.example.name
+  server_name         = azurerm_mysql_flexible_server.example.name
   start_ip_address    = "0.0.0.0"
   end_ip_address      = "0.0.0.0"
 }
 
 
-resource "azurerm_mysql_configuration" "example" {
+resource "azurerm_mysql_flexible_server_configuration" "example" {
   name                = "interactive_timeout"
   resource_group_name = azurerm_resource_group.example.name
-  server_name         = azurerm_mysql_server.example.name
+  server_name         = azurerm_mysql_flexible_server.example.name
   value               = "2147483"
 }
 
-resource "azurerm_mysql_configuration" "time_zone" {
+resource "azurerm_mysql_flexible_server_configuration" "time_zone" {
   name                = "time_zone"
   resource_group_name = azurerm_resource_group.example.name
-  server_name         = azurerm_mysql_server.example.name
+  server_name         = azurerm_mysql_flexible_server.example.name
   value               = "-8:00" // Add appropriate offset based on your region.
 }
