@@ -21,7 +21,7 @@ This quickstart shows you how to deploy an existing Java Spring Cloud applicatio
   * [Clone and build the repo](#clone-and-build-the-repo)
   * [Unit 1 - Deploy and monitor Spring Boot apps](#unit-1---deploy-and-monitor-spring-boot-apps)
   * [Unit 2 - AUTOMATE deployments using GitHub Actions](#unit-2---automate-deployments-using-github-actions)
-  * [Unit 3 - Manage application secrets using Azure KeyVault](#unit-3---manage-application-secrets-using-azure-keyvault)
+  * [Unit 3 - Enable Managed Identities for applications in Azure Spring Apps](#unit-3---enable-managed-identities-for-applications-in-azure-spring-apps)
   * [Next Steps](#next-steps)
 
 ## What will you experience
