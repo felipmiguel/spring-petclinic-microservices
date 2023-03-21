@@ -7,19 +7,19 @@ spring:
     gateway:
       routes:
         - id: vets-service
-          uri: http://vets-service
+          uri: https://vets-service
           predicates:
             - Path=/api/vet/**
           filters:
             - StripPrefix=2
         - id: visits-service
-          uri: http://visits-service
+          uri: https://visits-service
           predicates:
             - Path=/api/visit/**
           filters:
             - StripPrefix=2
         - id: customers-service
-          uri: http://customers-service
+          uri: https://customers-service
           predicates:
             - Path=/api/customer/**
           filters:

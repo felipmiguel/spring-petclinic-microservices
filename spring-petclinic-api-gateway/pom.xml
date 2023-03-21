@@ -65,6 +65,12 @@
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.2.1</version>
+        </dependency>
+
         <!-- Third parties -->
         <dependency>
             <groupId>org.jolokia</groupId>
@@ -83,6 +89,9 @@
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-micrometer</artifactId>
         </dependency>
+
+
+
 
         <!-- Webjars -->
         <dependency>

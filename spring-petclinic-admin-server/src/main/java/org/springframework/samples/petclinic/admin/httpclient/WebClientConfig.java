@@ -1,16 +1,14 @@
-package org.springframework.samples.petclinic.api.httpclient;
+package org.springframework.samples.petclinic.admin.httpclient;
 
-import java.util.LinkedList;
-import java.util.List;
-
-
-import javax.net.ssl.SNIMatcher;
-import javax.net.ssl.SNIServerName;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLParameters;
-
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslProvider;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+import reactor.netty.http.client.HttpClient;
+
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.ssl.SSLContexts;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,11 +16,21 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.SslProvider;
-import lombok.extern.slf4j.Slf4j;
-import reactor.netty.http.client.HttpClient;
+import java.security.KeyStore;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
+
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+
+import javax.net.ssl.*;
+import java.util.LinkedList;
+import java.util.List;
 
 @Configuration
 @Slf4j
@@ -79,33 +87,12 @@ public class WebClientConfig {
         return builder.build();
     }
 
-    @Bean
-    WebClient.Builder externalWebClientBuilder() {
-        log.info("Creating reactive spring webclient builder for external calls");
-        return WebClient.builder()
-            .clientConnector(new ReactorClientHttpConnector(httpClient()));
-    }
-
     // @Bean
-    // public RestTemplate restTemplate() throws Exception {
-    //     KeyStore ks = KeyStore.getInstance("AzureKeyVault");
-    //     SSLContext sslContext = SSLContexts.custom()
-    //         .loadTrustMaterial(ks, new TrustSelfSignedStrategy())
-    //         .build();
-
-    //     HostnameVerifier allowAll = (String hostName, SSLSession session) -> true;
-    //     SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext, allowAll);
-
-    //     CloseableHttpClient httpClient = HttpClients.custom()
-    //         .setSSLSocketFactory(csf)
-    //         .build();
-
-    //     HttpComponentsClientHttpRequestFactory requestFactory
-    //         = new HttpComponentsClientHttpRequestFactory();
-
-    //     requestFactory.setHttpClient(httpClient);
-    //     RestTemplate restTemplate = new RestTemplate(requestFactory);
-    //     return restTemplate;
+    // WebClient.Builder externalWebClientBuilder() {
+    //     log.info("Creating reactive spring webclient builder for external calls");
+    //     return WebClient.builder()
+    //         .clientConnector(new ReactorClientHttpConnector(httpClient()));
     // }
+
 
 }

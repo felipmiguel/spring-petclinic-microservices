@@ -50,17 +50,17 @@ public class ApiGatewayApplication {
         SpringApplication.run(ApiGatewayApplication.class, args);
     }
 
-    @Bean
-    @LoadBalanced
-    RestTemplate loadBalancedRestTemplate() {
-        return new RestTemplate();
-    }
+    // @Bean
+    // @LoadBalanced
+    // RestTemplate loadBalancedRestTemplate() {
+    //     return new RestTemplate();
+    // }
 
-    @Bean
-    @LoadBalanced
-    public WebClient.Builder loadBalancedWebClientBuilder() {
-        return WebClient.builder();
-    }
+    // @Bean
+    // @LoadBalanced
+    // public WebClient.Builder loadBalancedWebClientBuilder() {
+    //     return WebClient.builder();
+    // }
 
     @Value("classpath:/static/index.html")
     private Resource indexHtml;
