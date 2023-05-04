@@ -42,7 +42,7 @@ In order to deploy a Java app to cloud, you need an Azure subscription. If you d
 In addition, you will need the following:
 
 | [Azure CLI version 2.44.0 or higher](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) 
-| [Java 8](https://adoptium.net/temurin/releases/?version=8) 
+| [Java 17](https://learn.microsoft.com/en-us/java/openjdk/download#openjdk-17) 
 | [Maven](https://maven.apache.org/download.cgi) 
 | [Git](https://git-scm.com/)
 |
@@ -612,7 +612,6 @@ Create an Azure Active Directory application:
 AZURE_CLIENT_ID=$(az ad app create --display-name github-petclinic-actions --query appId --output tsv)
 GITHUB_OBJECTID=$(az ad app show --id $AZURE_CLIENT_ID --query id --output tsv)
 ```
-```
 
 Create a service principal for the application:
 
@@ -688,7 +687,7 @@ Enable System Assigned Identities for applications and export identities to envi
     az spring app identity assign --name ${VETS_SERVICE}
     export VETS_SERVICE_IDENTITY=$(az spring app show --name ${VETS_SERVICE} --query 'identity.principalId' --output tsv)
     
-    az spring app identity assign --name --name ${VISITS_SERVICE}
+    az spring app identity assign --name ${VISITS_SERVICE}
     export VISITS_SERVICE_IDENTITY=$(az spring app show --name ${VISITS_SERVICE} --query 'identity.principalId' --output tsv)
 ```
 
